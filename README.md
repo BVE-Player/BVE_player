@@ -16,6 +16,12 @@ let me introduce you it have some funcion
 ```
 
 ---
+# Installation
+```
+
+
+```
+---
 
 ## real time
 

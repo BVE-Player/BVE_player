@@ -4,14 +4,47 @@ import numpy as np
 import sys
 from BVEData import BVEData
 from Yolo import Yolo
+from Tracker import Tracker
+
 
 def onMouse( event, x, y, flags, param ):
     if event == cv2.EVENT_LBUTTONDOWN:
         param[1].setShape( x, y )
         dictResult = param[1].checkBoxes(x, y)
         print( dictResult )
+        # print( "hanelso")
     else:
         pass
+
+def checkActionFlagKey( key, playerData ):
+
+    dictData = {}
+
+    dictKeyAct = {
+        ord(' ') : playerData.changeStatus,
+        ord('q') : playerData.setEndFlag,
+        ord('r') : playerData.reinitialize,
+        ord('t') : playerData.setAction,
+        ord('y') : playerData.setAction,
+        ord('p') : playerData.setTrackbarData
+    }
+
+    if key == ord(' '):
+        pass
+    elif key == ord( 'p' ):
+        pass
+    elif key == ord('r'):
+        pass
+    elif key == ord('y'):
+        dictData[ "key" ] = key
+    elif key == ord('t'):
+        dictData[ "key" ] = key
+    elif key == ord('q'):
+        pass
+
+    if key in dictKeyAct:
+        dictKeyAct[ key ]( dictData )
+    
 
 def notting(pos): # 트랙바 핸들러
     pass
@@ -19,11 +52,12 @@ def player( filePath ):
     frameRate = 20
     swich = 0
     # 데이터 저장 객체 생성
-    objData = BVEData()
-    objYolo = None
+    playerData = BVEData()
 
-
+    frame = None
     image = None
+    EditedImg = None
+    dictActionFlag = {}
     flag = 0 #정지 상태
     L_TH = 0 #트랙바 low
     H_TH = 0 #트랙바 high
@@ -39,45 +73,35 @@ def player( filePath ):
 
 
     while 1: # 비디오재생
-        if flag == 1:# push - space bar
-            frame = image
+        if playerData.stopFlag == True:# push - space bar
+            pass
         else:
             ret, frame = cap.read()
             if not ret:# while문을 빠져나오기 위한 조건문
                 break
-        cv2.imshow('video',frame)
+        playerData.setImage( frame )
+
         # 63 52
         # target bar의 위치값을 받음
         Low_TH = cv2.getTrackbarPos('Low_TH', 'video')
         High_TH = cv2.getTrackbarPos('High_TH', 'video')
 
         # 마우스 Event에 대한 Callback 설정
-        cv2.setMouseCallback( "video", onMouse, [ frame, objData ])
-        # print( objData )
+        cv2.setMouseCallback( "video", onMouse, [ frame, playerData ])
 
-        if objYolo is not None:
-            dictTmp = objYolo.doYolo()
-            objYolo = None
+        # 편집 기능( Yolo, Tracker )
+        EditedImg = playerData.doAction()
 
-            objData.setBoxes( dictTmp )
-            objData.printBoxes()
+        # image 출력
+        # cv2.imshow('video2', frame)
+        cv2.imshow('video', EditedImg )
 
         key = cv2.waitKey(33)
-        if key == 32: # space
-            flag = not flag
-            image = frame
-        elif key == 112 :# p
-            L_TH = Low_TH
-            H_TH = High_TH
-            print(L_TH, H_TH)
-        elif key == 114: # r
-            objData = BVEData()
-        elif key == 121: # y
-            flag = not flag
-            image = frame
-            objYolo = Yolo( frame )
-        elif key == 113: # q
+        checkActionFlagKey( key, playerData)
+
+        if playerData.endFlag == True:
             break
+
 
     cap.release()
     cv2.destroyAllWindows()

@@ -23,7 +23,7 @@ class Yolo():
         if img is None:
             print( 'No ImageData' )
             exit()
-        self.imgData = img
+        self.imgData = img.copy()
 
         result = Yolo.readNetFile()
         result = Yolo.readClassNames()
@@ -48,19 +48,26 @@ class Yolo():
         cls.layer_names = cls.net.getLayerNames()
         cls.OutputLayers = [ cls.layer_names[i[0] - 1] for i in cls.net.getUnconnectedOutLayers() ]
 
-    def doYolo( self ):
-        img = self.imgData
+    def setDictBoxes( self, dictBoxes ):
+        self.dictBoxes = dictBoxes
 
-        img, dictBoxes = Yolo.initializeSetting( img )
+    def setImage( self, img ):
+        self.imgData = img.copy()
 
-        return dictBoxes
+    def do( self, img ):
+        self.setImage( img )
+
+        EditedImg, dictBoxes = Yolo.initializeSetting( self.imgData )
+
+        self.setDictBoxes( dictBoxes )
+        return EditedImg
         
         
     @classmethod
     def initializeSetting( cls, img ):
         dictBoxes = {}
         blob = cv2.dnn.blobFromImage( img, 1/255., (320, 320), swapRB=True )
-        print( blob )
+        # print( blob )
         cls.net.setInput( blob )
         outs = cls.net.forward( cls.OutputLayers )
 
@@ -84,7 +91,7 @@ class Yolo():
                     bw = int(detection[2] * w)
                     bh = int(detection[3] * h)
                     MyData = ( cx, cy, bw, bh )
-                    print( MyData )
+                    # print( MyData )
 
                     # 바운딩 박스 좌상단 좌표
                     sx = int(cx - bw / 2)
