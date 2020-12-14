@@ -3,8 +3,6 @@ import os
 import numpy as np
 import sys
 from BVEData import BVEData
-from Yolo import Yolo
-from Tracker import Tracker
 
 
 def onMouse( event, x, y, flags, param ):
@@ -15,6 +13,25 @@ def onMouse( event, x, y, flags, param ):
         # print( "hanelso")
     else:
         pass
+
+def mappingMSG( msg ):
+
+    result = -1
+
+    dictMsgKey = {
+        "tracking" : ord('t'),
+        "YOLO" : ord('y'),
+        "stop" : ord(" "),
+        "start" : ord(" "),
+        "reset" : ord('r'),
+        "break" : ord('q'),
+        "" : -1
+    }
+
+    if msg in dictMsgKey.keys():
+        result = dictMsgKey[msg]
+
+    return result
 
 def checkActionFlagKey( key, playerData ):
 
@@ -53,6 +70,8 @@ def player( filePath ):
     swich = 0
     # 데이터 저장 객체 생성
     playerData = BVEData()
+
+    playerData.run_voicemode()
 
     frame = None
     image = None
@@ -97,10 +116,17 @@ def player( filePath ):
         cv2.imshow('video', EditedImg )
 
         key = cv2.waitKey(33)
+        msg = playerData.getVoiceData()
+        if msg != "":
+            print( msg )
+        key = mappingMSG( msg )
+
         checkActionFlagKey( key, playerData)
 
         if playerData.endFlag == True:
             break
+
+    playerData.stop_voicemode()
 
 
     cap.release()

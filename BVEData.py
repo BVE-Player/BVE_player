@@ -1,5 +1,6 @@
 from Yolo import Yolo
 from Tracker import Tracker
+from HVoice import H_Voice as hv 
 
 
 class BVEData():
@@ -25,6 +26,8 @@ class BVEData():
         self.dictBoxes = {}
         self.dictActionFlag = {}
         self.dictFnLists = {}
+
+        self.objHV = hv()
 
     def setShape( self, x, y ):
         self.x = x
@@ -109,6 +112,15 @@ class BVEData():
     @classmethod
     def getKeyValue( cls, strKey ):
         return cls.dictKeyCreator[ strKey ]
+
+    def run_voicemode( self ):
+        self.objHV.listen_background()
+
+    def stop_voicemode( self ):
+        self.objHV.stop_listen_background()
+
+    def getVoiceData( self ):
+        return self.objHV.getMsg()
 
         
 
