@@ -25,7 +25,7 @@ class H_Voice:
 
     def callback( self, recognizer, audio ):
         try:
-            strMsg = recognizer.recognize_google( audio )
+            strMsg = recognizer.recognize_google( audio, language='ko' )
             print( self.strMsg )
             self.strMsg = strMsg
         except Exception as e:

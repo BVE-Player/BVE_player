@@ -19,13 +19,12 @@ def mappingMSG( msg ):
     result = -1
 
     dictMsgKey = {
-        "tracking" : ord('t'),
-        "YOLO" : ord('y'),
-        "stop" : ord(" "),
-        "start" : ord(" "),
-        "reset" : ord('r'),
-        "break" : ord('q'),
-        "" : -1
+        "추적" : ord('t'),
+        "인식" : ord('y'),
+        "그만" : ord(" "),
+        "고" : ord(" "),
+        "초기화" : ord('r'),
+        "꺼져" : ord('q'),
     }
 
     if msg in dictMsgKey.keys():
@@ -119,7 +118,9 @@ def player( filePath ):
         msg = playerData.getVoiceData()
         if msg != "":
             print( msg )
-        key = mappingMSG( msg )
+        key2 = mappingMSG( msg )
+        if key2 != -1:
+            key = key2
 
         checkActionFlagKey( key, playerData)
 
